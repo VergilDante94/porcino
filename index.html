@@ -6,7 +6,7 @@
 <title>Porcino Cubano - Empresa Porcina</title>
 <style>
   :root {
-    --primary: #c4350a;
+    --primary: #FF0000;
     --primary-dark: #CC0000;
     --accent: #ff9800;
     --bg: #f5f5f0;
@@ -128,6 +128,7 @@
       <a href="#equipos">Equipos</a>
       <a href="#galeria">Galería</a>
       <a href="#contacto" class="cta">Contacto</a>
+      <a href="/admin.html" class="cta" style="background:#333;">Admin</a>
     </nav>
   </div>
 </header>
@@ -212,8 +213,120 @@
       <p><a href="#contacto">Contacto</a></p>
     </div>
   </div>
-  <div class="copy">© 2026 Porcino Cubano. Todos los derechos reservados.</div>
-</footer>
+<div class="copy">© 2026 Porcino Cubano. Todos los derechos reservados.</div>
+  </footer>
 
+<script>
+async function loadContent() {
+  try {
+    const res = await fetch('/api/content');
+    const data = await res.json();
+    applyContent(data);
+  } catch (e) {
+    console.error('Error loading content:', e);
+  }
+}
+
+function applyContent(d) {
+  document.documentElement.style.setProperty('--primary', d.colors.primary);
+  document.documentElement.style.setProperty('--primary-dark', d.colors.primaryDark);
+  document.documentElement.style.setProperty('--accent', d.colors.accent);
+
+  // Hero
+  const heroH2 = document.querySelector('.hero h2');
+  const heroP = document.querySelector('.hero p');
+  const heroBtn = document.querySelector('.hero .btn');
+  if (heroH2) heroH2.textContent = d.hero.title;
+  if (heroP) heroP.textContent = d.hero.subtitle;
+  if (heroBtn) heroBtn.textContent = d.hero.ctaText;
+
+  // Nosotros
+  const nosotrosH3 = document.querySelector('#nosotros h3');
+  const nosotrosLead = document.querySelector('#nosotros .lead');
+  if (nosotrosH3) nosotrosH3.textContent = d.nosotros.title;
+  if (nosotrosLead) nosotrosLead.textContent = d.nosotros.lead;
+  const nosotrosCards = document.querySelectorAll('#nosotros .card');
+  d.nosotros.cards.forEach((card, i) => {
+    const c = nosotrosCards[i];
+    if (c) {
+      const icon = c.querySelector('.icon');
+      const h4 = c.querySelector('h4');
+      const p = c.querySelector('p');
+      if (icon) icon.textContent = card.icon;
+      if (h4) h4.textContent = card.title;
+      if (p) p.textContent = card.text;
+    }
+  });
+
+  // Servicios
+  const serviciosH3 = document.querySelector('#servicios h3');
+  const serviciosLead = document.querySelector('#servicios .lead');
+  if (serviciosH3) serviciosH3.textContent = d.servicios.title;
+  if (serviciosLead) serviciosLead.textContent = d.servicios.lead;
+  const serviciosCards = document.querySelectorAll('#servicios .card');
+  d.servicios.cards.forEach((card, i) => {
+    const c = serviciosCards[i];
+    if (c) {
+      const h4 = c.querySelector('h4');
+      const p = c.querySelector('p');
+      if (h4) h4.textContent = card.title;
+      if (p) p.textContent = card.text;
+    }
+  });
+
+  // Equipos
+  const equiposH3 = document.querySelector('#equipos h3');
+  const equiposLead = document.querySelector('#equipos .lead');
+  if (equiposH3) equiposH3.textContent = d.equipos.title;
+  if (equiposLead) equiposLead.textContent = d.equipos.lead;
+  const miembros = document.querySelectorAll('#equipos .member');
+  d.equipos.members.forEach((m, i) => {
+    const mem = miembros[i];
+    if (mem) {
+      const avatar = mem.querySelector('.avatar');
+      const h4 = mem.querySelector('h4');
+      const p = mem.querySelector('p');
+      if (avatar) avatar.textContent = m.initial;
+      if (h4) h4.textContent = m.name;
+      if (p) p.textContent = m.role;
+    }
+  });
+
+  // Galeria
+  const galeriaH3 = document.querySelector('#galeria h3');
+  const galeriaLead = document.querySelector('#galeria .lead');
+  if (galeriaH3) galeriaH3.textContent = d.galeria.title;
+  if (galeriaLead) galeriaLead.textContent = d.galeria.lead;
+  const galeriaItems = document.querySelectorAll('#galeria .gallery div');
+  d.galeria.images.forEach((img, i) => {
+    if (galeriaItems[i]) galeriaItems[i].textContent = img;
+  });
+
+  // Contacto
+  const contactoH3 = document.querySelector('#contacto h3');
+  const contactoLead = document.querySelector('#contacto .lead');
+  if (contactoH3) contactoH3.textContent = d.contacto.title;
+  if (contactoLead) contactoLead.textContent = d.contacto.lead;
+  const contactoBox = document.querySelector('.contact-box');
+  if (contactoBox) {
+    contactoBox.innerHTML = `
+      <p><strong>Teléfono:</strong> ${d.contacto.phone}</p>
+      <p><strong>Correo:</strong> ${d.contacto.email}</p>
+      <p><strong>Dirección:</strong> ${d.contacto.address}</p>
+      <p><strong>Horario:</strong> ${d.contacto.hours}</p>
+    `;
+  }
+
+  // Footer
+  const footerDesc = document.querySelector('.footer-inner > div:first-child p');
+  const footerPhone = document.querySelector('.footer-inner > div:nth-child(2) p:first-child');
+  const footerEmail = document.querySelector('.footer-inner > div:nth-child(2) p:last-child');
+  if (footerDesc) footerDesc.textContent = d.footer.description;
+  if (footerPhone) footerPhone.textContent = `Tel: ${d.footer.phone}`;
+  if (footerEmail) footerEmail.textContent = `Email: ${d.footer.email}`;
+}
+
+document.addEventListener('DOMContentLoaded', loadContent);
+</script>
 </body>
 </html>

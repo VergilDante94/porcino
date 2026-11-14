@@ -1,0 +1,106 @@
+{
+  "hero": {
+    "title": "Bienvenidos a Porcino Cubano",
+    "subtitle": "Producción porcina de calidad, comprometida con el desarrollo agropecuario de Cuba. Carne fresca, genética mejorada y asesoría técnica.",
+    "ctaText": "Contáctanos"
+  },
+  "nosotros": {
+    "title": "Sobre Nosotros",
+    "lead": "Somos una empresa dedicada a la cría, engorde y comercialización de cerdos, con años de experiencia en el sector porcino cubano. Trabajamos con genética mejorada y buenas prácticas de bienestar animal.",
+    "cards": [
+      {
+        "icon": "🐷",
+        "title": "Misión",
+        "text": "Producir carne porcina de alta calidad para el mercado nacional."
+      },
+      {
+        "icon": "🌱",
+        "title": "Visión",
+        "text": "Ser referente en la porcicultura cubana moderna y sostenible."
+      },
+      {
+        "icon": "🤝",
+        "title": "Valores",
+        "text": "Compromiso, calidad, trabajo en equipo y respeto al medio ambiente."
+      }
+    ]
+  },
+  "servicios": {
+    "title": "Nuestros Servicios",
+    "lead": "Ofrecemos una gama completa de servicios para la producción porcina.",
+    "cards": [
+      {
+        "title": "Cría y engorde",
+        "text": "Manejo integral de la piara desde el nacimiento hasta el sacrificio."
+      },
+      {
+        "title": "Venta de lechones",
+        "text": "Lechones destetados con vacunación y desparasitación al día."
+      },
+      {
+        "title": "Asesoría técnica",
+        "text": "Acompañamiento en nutrición, sanidad y manejo de la piara."
+      },
+      {
+        "title": "Carne porcina",
+        "text": "Comercialización de carne fresca y productos derivados."
+      }
+    ]
+  },
+  "equipos": {
+    "title": "Nuestro Equipo",
+    "lead": "Profesionales comprometidos con la producción porcina.",
+    "members": [
+      {
+        "name": "Ing. Agrónomo",
+        "role": "Director de producción",
+        "initial": "A"
+      },
+      {
+        "name": "Veterinario",
+        "role": "Sanidad animal",
+        "initial": "B"
+      },
+      {
+        "name": "Técnico",
+        "role": "Manejo de piara",
+        "initial": "C"
+      },
+      {
+        "name": "Administración",
+        "role": "Gestión y ventas",
+        "initial": "D"
+      }
+    ]
+  },
+  "galeria": {
+    "title": "Galería",
+    "lead": "Imágenes de nuestras instalaciones y animales.",
+    "images": [
+      "Granja",
+      "Piara",
+      "Instalaciones",
+      "Alimentación",
+      "Sanidad",
+      "Comercialización"
+    ]
+  },
+  "contacto": {
+    "title": "Contacto",
+    "lead": "Póngase en contacto con nosotros.",
+    "phone": "+53 5 XXX XXXX",
+    "email": "contacto@porcinocubano.cu",
+    "address": "Provincia, Cuba",
+    "hours": "Lunes a Viernes, 8:00 - 17:00"
+  },
+  "footer": {
+    "description": "Empresa porcina de Cuba. Calidad y compromiso con el campo.",
+    "phone": "+53 5 XXX XXXX",
+    "email": "contacto@porcinocubano.cu"
+  },
+  "colors": {
+    "primary": "#c61c17",
+    "primaryDark": "#575757",
+    "accent": "#c61c17"
+  }
+}

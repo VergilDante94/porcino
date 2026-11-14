@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin - Porcino Cubano</title>
+<style>
+  :root { --primary: #FF0000; --primary-dark: #CC0000; --bg: #f5f5f0; --card: #fff; --muted: #666; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: #222; line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  .card { background: var(--card); border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  h1, h2, h3 { color: var(--primary-dark); margin-bottom: 16px; }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; margin-bottom: 6px; font-weight: 500; }
+  input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+  input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,0,0,.1); }
+  button { background: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+  button:hover { background: var(--primary-dark); }
+  button.secondary { background: #e0e0e0; color: #222; }
+  button.secondary:hover { background: #d0d0d0; }
+  .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .alert { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; }
+  .alert.error { background: #fee; color: #c00; display: block; }
+  .alert.success { background: #efe; color: #060; display: block; }
+  .section-editor { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
+  .section-editor:last-child { border-bottom: none; }
+  .field-row { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .card-editor { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin: 10px 0; }
+  .card-editor h4 { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+  .actions { display: flex; gap: 8px; margin-top: 10px; }
+  .actions button { padding: 6px 12px; font-size: 12px; }
+  .color-picker { display: flex; align-items: center; gap: 8px; }
+  .color-picker input[type="color"] { width: 40px; height: 32px; border: none; border-radius: 4px; cursor: pointer; }
+  .hidden { display: none !important; }
+  .login-form { max-width: 400px; margin: 0 auto; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login View -->
+    <div id="loginView" class="card login-form">
+      <h1 style="text-align:center;">Panel de Administración</h1>
+      <div id="loginAlert" class="alert"></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Usuario</label>
+          <input type="text" id="username" name="username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" style="width:100%;">Iniciar sesión</button>
+      </form>
+    </div>
+
+    <!-- Admin Panel View -->
+    <div id="adminView" class="hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1>Editor de Contenido</h1>
+        <button class="secondary" id="logoutBtn">Cerrar sesión</button>
+      </div>
+      <div id="saveAlert" class="alert"></div>
+      <div class="btn-group" style="margin-bottom:20px;">
+        <button id="saveBtn">Guardar cambios</button>
+        <button class="secondary" id="previewBtn" onclick="window.open('/', '_blank')">Ver sitio</button>
+      </div>
+
+      <!-- Colores -->
+      <div class="section-editor">
+        <h2>Colores del sitio</h2>
+        <div class="field-row">
+          <div class="form-group">
+            <label>Color principal</label>
+            <div class="color-picker">
+              <input type="color" id="colorPrimary" />
+              <input type="text" id="colorPrimaryHex" readonly style="flex:1;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Color principal oscuro</label>
+            <div class="color-picker">
+              <input type="color" id="colorDark" />
+              <input type="text" id="colorDarkHex" readonly style="flex:1;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Color de acento</label>
+            <div class="color-picker">
+              <input type="color" id="colorAccent" />
+              <input type="text" id="colorAccentHex" readonly style="flex:1;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="section-editor">
+        <h2>Hero (Inicio)</h2>
+        <div class="form-group">
+          <label>Título principal</label>
+          <input type="text" id="heroTitle" />
+        </div>
+        <div class="form-group">
+          <label>Subtítulo</label>
+          <textarea id="heroSubtitle" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Texto del botón</label>
+          <input type="text" id="heroCta" />
+        </div>
+      </div>
+
+      <!-- Nosotros -->
+      <div class="section-editor">
+        <h2>Nosotros</h2>
+        <div class="form-group">
+          <label>Título de sección</label>
+          <input type="text" id="nosotrosTitle" />
+        </div>
+        <div class="form-group">
+          <label>Texto introductorio</label>
+          <textarea id="nosotrosLead" rows="3"></textarea>
+        </div>
+        <h3>Tarjetas</h3>
+        <div id="nosotrosCards"></div>
+        <button class="secondary" onclick="addCard('nosotros')">+ Añadir tarjeta</button>
+      </div>
+
+      <!-- Servicios -->
+      <div class="section-editor">
+        <h2>Servicios</h2>
+        <div class="form-group">
+          <label>Título de sección</label>
+          <input type="text" id="serviciosTitle" />
+        </div>
+        <div class="form-group">
+          <label>Texto introductorio</label>
+          <textarea id="serviciosLead" rows="3"></textarea>
+        </div>
+        <h3>Tarjetas</h3>
+        <div id="serviciosCards"></div>
+        <button class="secondary" onclick="addCard('servicios')">+ Añadir tarjeta</button>
+      </div>
+
+      <!-- Equipo -->
+      <div class="section-editor">
+        <h2>Equipo</h2>
+        <div class="form-group">
+          <label>Título de sección</label>
+          <input type="text" id="equiposTitle" />
+        </div>
+        <div class="form-group">
+          <label>Texto introductorio</label>
+          <textarea id="equiposLead" rows="3"></textarea>
+        </div>
+        <h3>Miembros</h3>
+        <div id="equiposMembers"></div>
+        <button class="secondary" onclick="addMember()">+ Añadir miembro</button>
+      </div>
+
+      <!-- Galería -->
+      <div class="section-editor">
+        <h2>Galería</h2>
+        <div class="form-group">
+          <label>Título de sección</label>
+          <input type="text" id="galeriaTitle" />
+        </div>
+        <div class="form-group">
+          <label>Texto introductorio</label>
+          <textarea id="galeriaLead" rows="3"></textarea>
+        </div>
+        <h3>Imágenes (texto placeholder)</h3>
+        <div id="galeriaImages"></div>
+        <button class="secondary" onclick="addImage()">+ Añadir imagen</button>
+      </div>
+
+      <!-- Contacto -->
+      <div class="section-editor">
+        <h2>Contacto</h2>
+        <div class="form-group">
+          <label>Título de sección</label>
+          <input type="text" id="contactoTitle" />
+        </div>
+        <div class="form-group">
+          <label>Texto introductorio</label>
+          <textarea id="contactoLead" rows="3"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" id="contactoPhone" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="contactoEmail" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" id="contactoAddress" />
+          </div>
+          <div class="form-group">
+            <label>Horario</label>
+            <input type="text" id="contactoHours" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="section-editor">
+        <h2>Footer</h2>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="footerDesc" rows="3"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" id="footerPhone" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="footerEmail" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+let currentData = null;
+
+const loginView = document.getElementById('loginView');
+const adminView = document.getElementById('adminView');
+const loginForm = document.getElementById('loginForm');
+const loginAlert = document.getElementById('loginAlert');
+const logoutBtn = document.getElementById('logoutBtn');
+const saveBtn = document.getElementById('saveBtn');
+const saveAlert = document.getElementById('saveAlert');
+
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    ...options
+  });
+  return res.json();
+}
+
+function showAlert(el, message, isError = false) {
+  el.textContent = message;
+  el.className = 'alert ' + (isError ? 'error' : 'success');
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+async function checkAuth() {
+  const res = await api('/api/check-auth');
+  if (res.isAdmin) {
+    loginView.classList.add('hidden');
+    adminView.classList.remove('hidden');
+    loadContent();
+  }
+}
+
+async function loadContent() {
+  const res = await api('/api/content');
+  currentData = res;
+  populateForm(res);
+}
+
+function populateForm(d) {
+  // Colores
+  document.getElementById('colorPrimary').value = d.colors.primary;
+  document.getElementById('colorPrimaryHex').value = d.colors.primary;
+  document.getElementById('colorDark').value = d.colors.primaryDark;
+  document.getElementById('colorDarkHex').value = d.colors.primaryDark;
+  document.getElementById('colorAccent').value = d.colors.accent;
+  document.getElementById('colorAccentHex').value = d.colors.accent;
+
+  // Hero
+  document.getElementById('heroTitle').value = d.hero.title;
+  document.getElementById('heroSubtitle').value = d.hero.subtitle;
+  document.getElementById('heroCta').value = d.hero.ctaText;
+
+  // Nosotros
+  document.getElementById('nosotrosTitle').value = d.nosotros.title;
+  document.getElementById('nosotrosLead').value = d.nosotros.lead;
+  renderCards('nosotros', d.nosotros.cards);
+
+  // Servicios
+  document.getElementById('serviciosTitle').value = d.servicios.title;
+  document.getElementById('serviciosLead').value = d.servicios.lead;
+  renderCards('servicios', d.servicios.cards);
+
+  // Equipo
+  document.getElementById('equiposTitle').value = d.equipos.title;
+  document.getElementById('equiposLead').value = d.equipos.lead;
+  renderMembers(d.equipos.members);
+
+  // Galeria
+  document.getElementById('galeriaTitle').value = d.galeria.title;
+  document.getElementById('galeriaLead').value = d.galeria.lead;
+  renderImages(d.galeria.images);
+
+  // Contacto
+  document.getElementById('contactoTitle').value = d.contacto.title;
+  document.getElementById('contactoLead').value = d.contacto.lead;
+  document.getElementById('contactoPhone').value = d.contacto.phone;
+  document.getElementById('contactoEmail').value = d.contacto.email;
+  document.getElementById('contactoAddress').value = d.contacto.address;
+  document.getElementById('contactoHours').value = d.contacto.hours;
+
+  // Footer
+  document.getElementById('footerDesc').value = d.footer.description;
+  document.getElementById('footerPhone').value = d.footer.phone;
+  document.getElementById('footerEmail').value = d.footer.email;
+
+  syncColorInputs();
+}
+
+function syncColorInputs() {
+  ['Primary', 'Dark', 'Accent'].forEach(name => {
+    const picker = document.getElementById('color' + name);
+    const hex = document.getElementById('color' + name + 'Hex');
+    picker.addEventListener('input', () => hex.value = picker.value);
+    hex.addEventListener('input', () => {
+      if (/^#[0-9A-Fa-f]{6}$/.test(hex.value)) picker.value = hex.value;
+    });
+  });
+}
+
+function renderCards(section, cards) {
+  const container = document.getElementById(section + 'Cards');
+  container.innerHTML = '';
+  cards.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'card-editor';
+    div.innerHTML = `
+      <h3>Tarjeta ${i+1} <button class="secondary" onclick="removeCard('${section}', ${i})" style="float:right;font-size:11px;padding:2px 8px;">Eliminar</button></h3>
+      ${section === 'nosotros' ? `
+        <div class="form-group"><label>Icono</label><input type="text" value="${card.icon}" data-field="icon" data-index="${i}" /></div>
+      ` : ''}
+      <div class="form-group"><label>Título</label><input type="text" value="${card.title}" data-field="title" data-index="${i}" /></div>
+      <div class="form-group"><label>Texto</label><textarea data-field="text" data-index="${i}">${card.text}</textarea></div>
+    `;
+    container.appendChild(div);
+  });
+  attachCardListeners(section);
+}
+
+function attachCardListeners(section) {
+  document.querySelectorAll(`#${section}Cards [data-field]`).forEach(el => {
+    el.addEventListener('input', () => {
+      const i = parseInt(el.dataset.index);
+      const field = el.dataset.field;
+      currentData[section].cards[i][field] = el.value;
+    });
+  });
+}
+
+function addCard(section) {
+  const newCard = section === 'nosotros' ? { icon: '⭐', title: 'Nuevo', text: 'Descripción' } : { title: 'Nuevo', text: 'Descripción' };
+  currentData[section].cards.push(newCard);
+  renderCards(section, currentData[section].cards);
+}
+
+function removeCard(section, index) {
+  if (confirm('Eliminar esta tarjeta?')) {
+    currentData[section].cards.splice(index, 1);
+    renderCards(section, currentData[section].cards);
+  }
+}
+
+function renderMembers(members) {
+  const container = document.getElementById('equiposMembers');
+  container.innerHTML = '';
+  members.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'card-editor';
+    div.innerHTML = `
+      <h3>Miembro ${i+1} <button class="secondary" onclick="removeMember(${i})" style="float:right;font-size:11px;padding:2px 8px;">Eliminar</button></h3>
+      <div class="field-row">
+        <div class="form-group"><label>Nombre</label><input type="text" value="${m.name}" data-field="name" data-index="${i}" /></div>
+        <div class="form-group"><label>Rol</label><input type="text" value="${m.role}" data-field="role" data-index="${i}" /></div>
+        <div class="form-group"><label>Inicial</label><input type="text" value="${m.initial}" data-field="initial" data-index="${i}" maxlength="1" style="width:60px;" /></div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  document.querySelectorAll('#equiposMembers [data-field]').forEach(el => {
+    el.addEventListener('input', () => {
+      const i = parseInt(el.dataset.index);
+      currentData.equipos.members[i][el.dataset.field] = el.value;
+    });
+  });
+}
+
+function addMember() {
+  currentData.equipos.members.push({ name: 'Nuevo', role: 'Rol', initial: 'N' });
+  renderMembers(currentData.equipos.members);
+}
+
+function removeMember(index) {
+  if (confirm('Eliminar miembro?')) {
+    currentData.equipos.members.splice(index, 1);
+    renderMembers(currentData.equipos.members);
+  }
+}
+
+function renderImages(images) {
+  const container = document.getElementById('galeriaImages');
+  container.innerHTML = '';
+  images.forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = 'card-editor';
+    div.style.display = 'flex';
+    div.style.gap = '10px';
+    div.style.alignItems = 'center';
+    div.innerHTML = `
+      <input type="text" value="${img}" data-index="${i}" style="flex:1;" />
+      <button class="secondary" onclick="removeImage(${i})" style="padding:6px 12px;">Eliminar</button>
+    `;
+    container.appendChild(div);
+  });
+  document.querySelectorAll('#galeriaImages input[data-index]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentData.galeria.images[parseInt(el.dataset.index)] = el.value;
+    });
+  });
+}
+
+function addImage() {
+  currentData.galeria.images.push('Nueva imagen');
+  renderImages(currentData.galeria.images);
+}
+
+function removeImage(index) {
+  if (confirm('Eliminar imagen?')) {
+    currentData.galeria.images.splice(index, 1);
+    renderImages(currentData.galeria.images);
+  }
+}
+
+function gatherFormData() {
+  return {
+    hero: {
+      title: document.getElementById('heroTitle').value,
+      subtitle: document.getElementById('heroSubtitle').value,
+      ctaText: document.getElementById('heroCta').value
+    },
+    nosotros: {
+      title: document.getElementById('nosotrosTitle').value,
+      lead: document.getElementById('nosotrosLead').value,
+      cards: currentData.nosotros.cards
+    },
+    servicios: {
+      title: document.getElementById('serviciosTitle').value,
+      lead: document.getElementById('serviciosLead').value,
+      cards: currentData.servicios.cards
+    },
+    equipos: {
+      title: document.getElementById('equiposTitle').value,
+      lead: document.getElementById('equiposLead').value,
+      members: currentData.equipos.members
+    },
+    galeria: {
+      title: document.getElementById('galeriaTitle').value,
+      lead: document.getElementById('galeriaLead').value,
+      images: currentData.galeria.images
+    },
+    contacto: {
+      title: document.getElementById('contactoTitle').value,
+      lead: document.getElementById('contactoLead').value,
+      phone: document.getElementById('contactoPhone').value,
+      email: document.getElementById('contactoEmail').value,
+      address: document.getElementById('contactoAddress').value,
+      hours: document.getElementById('contactoHours').value
+    },
+    footer: {
+      description: document.getElementById('footerDesc').value,
+      phone: document.getElementById('footerPhone').value,
+      email: document.getElementById('footerEmail').value
+    },
+    colors: {
+      primary: document.getElementById('colorPrimary').value,
+      primaryDark: document.getElementById('colorDark').value,
+      accent: document.getElementById('colorAccent').value
+    }
+  };
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const res = await api('/api/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+  if (res.success) {
+    loginView.classList.add('hidden');
+    adminView.classList.remove('hidden');
+    loadContent();
+  } else {
+    showAlert(loginAlert, res.message, true);
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  await api('/api/logout', { method: 'POST' });
+  adminView.classList.add('hidden');
+  loginView.classList.remove('hidden');
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+});
+
+saveBtn.addEventListener('click', async () => {
+  const data = gatherFormData();
+  const res = await api('/api/content', { method: 'POST', body: JSON.stringify(data) });
+  if (res.success) {
+    showAlert(saveAlert, 'Cambios guardados correctamente');
+    currentData = data;
+  } else {
+    showAlert(saveAlert, 'Error al guardar', true);
+  }
+});
+
+checkAuth();
+</script>
+</body>
+</html>
