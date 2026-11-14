@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Porcino Cubano - Empresa Porcina</title>
+<style>
+  :root {
+    --primary: #c4350a;
+    --primary-dark: #CC0000;
+    --accent: #ff9800;
+    --bg: #f5f5f0;
+    --text: #222;
+    --muted: #666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+  a { color: var(--primary); text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  /* Header */
+  header {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .nav {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 22px;
+  }
+  .brand h1 { font-size: 20px; color: var(--primary-dark); }
+  .brand small { color: var(--muted); font-size: 12px; }
+  .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav-links a {
+    padding: 8px 14px; border-radius: 6px; color: var(--text);
+    font-weight: 500; transition: background .2s;
+  }
+  .nav-links a:hover { background: var(--bg); color: var(--primary); }
+  .cta {
+    background: var(--accent); color: #fff; padding: 8px 16px;
+    border-radius: 6px; font-weight: 600;
+  }
+  .cta:hover { background: #e68900; color: #fff; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; padding: 70px 20px; text-align: center;
+  }
+  .hero h2 { font-size: 38px; margin-bottom: 12px; }
+  .hero p { font-size: 18px; max-width: 700px; margin: 0 auto 24px; opacity: .95; }
+  .hero .btn {
+    display: inline-block; background: #fff; color: var(--primary-dark);
+    padding: 12px 26px; border-radius: 8px; font-weight: 600;
+  }
+
+  /* Sections */
+  section { max-width: 1100px; margin: 0 auto; padding: 60px 20px; }
+  section h3 { font-size: 28px; color: var(--primary-dark); margin-bottom: 16px; }
+  section .lead { color: var(--muted); margin-bottom: 30px; max-width: 760px; }
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card {
+    background: #fff; border-radius: 10px; padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  }
+  .card h4 { color: var(--primary); margin-bottom: 8px; }
+  .card .icon { font-size: 32px; margin-bottom: 10px; }
+
+  /* Gallery */
+  .gallery { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .gallery div {
+    background: #ddd; border-radius: 8px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 14px;
+  }
+
+  /* Team */
+  .team { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .member { background: #fff; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
+  .member h4 { color: var(--primary-dark); }
+  .member p { color: var(--muted); font-size: 14px; }
+
+  /* Contact */
+  .contact-box { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .contact-box p { margin-bottom: 8px; }
+
+  /* Footer */
+  footer {
+    background: var(--primary-dark); color: #fff; padding: 40px 20px 20px;
+    margin-top: 40px;
+  }
+  .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  footer h4 { margin-bottom: 10px; color: var(--accent); }
+  footer p, footer a { color: #e8f5e9; font-size: 14px; }
+  footer a:hover { text-decoration: underline; }
+  .copy { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.15); font-size: 13px; opacity: .8; }
+
+  @media (max-width: 600px) {
+    .hero h2 { font-size: 28px; }
+    .nav { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div>
+        <h1>Porcino Cubano</h1>
+        <small>Empresa porcina de Cuba</small>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="#inicio">Inicio</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#equipos">Equipos</a>
+      <a href="#galeria">Galería</a>
+      <a href="#contacto" class="cta">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="inicio">
+  <h2>Bienvenidos a Porcino Cubano</h2>
+  <p>Producción porcina de calidad, comprometida con el desarrollo agropecuario de Cuba. Carne fresca, genética mejorada y asesoría técnica.</p>
+  <a href="#contacto" class="btn">Contáctanos</a>
+</div>
+
+<section id="nosotros">
+  <h3>Sobre Nosotros</h3>
+  <p class="lead">Somos una empresa dedicada a la cría, engorde y comercialización de cerdos, con años de experiencia en el sector porcino cubano. Trabajamos con genética mejorada y buenas prácticas de bienestar animal.</p>
+  <div class="grid">
+    <div class="card"><div class="icon">🐷</div><h4>Misión</h4><p>Producir carne porcina de alta calidad para el mercado nacional.</p></div>
+    <div class="card"><div class="icon">🌱</div><h4>Visión</h4><p>Ser referente en la porcicultura cubana moderna y sostenible.</p></div>
+    <div class="card"><div class="icon">🤝</div><h4>Valores</h4><p>Compromiso, calidad, trabajo en equipo y respeto al medio ambiente.</p></div>
+  </div>
+</section>
+
+<section id="servicios">
+  <h3>Nuestros Servicios</h3>
+  <p class="lead">Ofrecemos una gama completa de servicios para la producción porcina.</p>
+  <div class="grid">
+    <div class="card"><h4>Cría y engorde</h4><p>Manejo integral de la piara desde el nacimiento hasta el sacrificio.</p></div>
+    <div class="card"><h4>Venta de lechones</h4><p>Lechones destetados con vacunación y desparasitación al día.</p></div>
+    <div class="card"><h4>Asesoría técnica</h4><p>Acompañamiento en nutrición, sanidad y manejo de la piara.</p></div>
+    <div class="card"><h4>Carne porcina</h4><p>Comercialización de carne fresca y productos derivados.</p></div>
+  </div>
+</section>
+
+<section id="equipos">
+  <h3>Nuestro Equipo</h3>
+  <p class="lead">Profesionales comprometidos con la producción porcina.</p>
+  <div class="team">
+    <div class="member"><div class="avatar">A</div><h4>Ing. Agrónomo</h4><p>Director de producción</p></div>
+    <div class="member"><div class="avatar">B</div><h4>Veterinario</h4><p>Sanidad animal</p></div>
+    <div class="member"><div class="avatar">C</div><h4>Técnico</h4><p>Manejo de piara</p></div>
+    <div class="member"><div class="avatar">D</div><h4>Administración</h4><p>Gestión y ventas</p></div>
+  </div>
+</section>
+
+<section id="galeria">
+  <h3>Galería</h3>
+  <p class="lead">Imágenes de nuestras instalaciones y animales.</p>
+  <div class="gallery">
+    <div>Granja</div>
+    <div>Piara</div>
+    <div>Instalaciones</div>
+    <div>Alimentación</div>
+    <div>Sanidad</div>
+    <div>Comercialización</div>
+  </div>
+</section>
+
+<section id="contacto">
+  <h3>Contacto</h3>
+  <p class="lead">Póngase en contacto con nosotros.</p>
+  <div class="contact-box">
+    <p><strong>Teléfono:</strong> +53 5 XXX XXXX</p>
+    <p><strong>Correo:</strong> contacto@porcinocubano.cu</p>
+    <p><strong>Dirección:</strong> Provincia, Cuba</p>
+    <p><strong>Horario:</strong> Lunes a Viernes, 8:00 - 17:00</p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h4>Porcino Cubano</h4>
+      <p>Empresa porcina de Cuba. Calidad y compromiso con el campo.</p>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <p>Tel: +53 5 XXX XXXX</p>
+      <p>Email: contacto@porcinocubano.cu</p>
+    </div>
+    <div>
+      <h4>Enlaces</h4>
+      <p><a href="#nosotros">Nosotros</a></p>
+      <p><a href="#servicios">Servicios</a></p>
+      <p><a href="#contacto">Contacto</a></p>
+    </div>
+  </div>
+  <div class="copy">© 2026 Porcino Cubano. Todos los derechos reservados.</div>
+</footer>
+
+</body>
+</html>

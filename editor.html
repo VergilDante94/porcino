@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Editor - Porcino Cubano</title>
+<style>
+  :root {
+    --primary: #FF0000;
+    --primary-dark: #CC0000;
+    --accent: #ff9800;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; background: #f5f5f0; color: #222; line-height: 1.6; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    padding: 12px 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+  .toolbar label { font-weight: 600; font-size: 14px; }
+  .toolbar input[type="color"] { width: 40px; height: 32px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: none; }
+  .toolbar button {
+    background: var(--primary); color: #fff; border: none; padding: 8px 16px;
+    border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;
+  }
+  .toolbar button:hover { background: var(--primary-dark); }
+  .toolbar button.secondary { background: #e0e0e0; color: #222; }
+  .toolbar button.secondary:hover { background: #d0d0d0; }
+  .iframe-wrap { width: 100%; height: calc(100vh - 60px); }
+  iframe { width: 100%; height: 100%; border: none; }
+  .hint { padding: 8px 20px; background: #fff3cd; color: #856404; font-size: 13px; border-bottom: 1px solid #ffeaa7; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <label>Principal:</label>
+    <input type="color" id="colorPrimary" value="#FF0000" />
+    <label>Secundario:</label>
+    <input type="color" id="colorDark" value="#CC0000" />
+    <button class="secondary" id="exportBtn">Descargar HTML</button>
+    <button id="resetBtn">Restablecer</button>
+  </div>
+  <div class="hint">Haz doble clic sobre cualquier texto para editarlo. Los cambios se guardan automáticamente.</div>
+  <div class="iframe-wrap">
+    <iframe id="preview" src="index.html"></iframe>
+  </div>
+
+<script>
+  const colorPrimary = document.getElementById('colorPrimary');
+  const colorDark = document.getElementById('colorDark');
+  const preview = document.getElementById('preview');
+  const exportBtn = document.getElementById('exportBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let editMode = false;
+
+  function loadPrefs() {
+    const saved = localStorage.getItem('porcinoEditor');
+    if (saved) {
+      const p = JSON.parse(saved);
+      colorPrimary.value = p.primary || '#FF0000';
+      colorDark.value = p.dark || '#CC0000';
+    }
+  }
+
+  function savePrefs() {
+    localStorage.setItem('porcinoEditor', JSON.stringify({
+      primary: colorPrimary.value,
+      dark: colorDark.value
+    }));
+  }
+
+  function applyColors() {
+    const doc = preview.contentDocument || preview.contentWindow.document;
+    const rootStyle = doc.documentElement.style;
+    rootStyle.setProperty('--primary', colorPrimary.value);
+    rootStyle.setProperty('--primary-dark', colorDark.value);
+  }
+
+  function enableEdit() {
+    const doc = preview.contentDocument || preview.contentWindow.document;
+    const texts = doc.querySelectorAll('h1, h2, h3, h4, p, a, span, li');
+    texts.forEach(el => {
+      el.style.cursor = 'pointer';
+      el.title = 'Doble clic para editar';
+      el.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        const current = this.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = current;
+        input.style.cssText = 'width:100%;font-size:inherit;font-family:inherit;padding:2px;border:1px solid #ccc;border-radius:4px;';
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        input.select();
+
+        function saveEdit() {
+          const newText = input.value;
+          this.textContent = newText;
+          savePrefs();
+        }
+
+        input.addEventListener('blur', saveEdit.bind(this));
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            this.blur();
+          } else if (e.key === 'Escape') {
+            this.textContent = current;
+            this.blur();
+          }
+        }.bind(this));
+      });
+    });
+  }
+
+  colorPrimary.addEventListener('input', () => { applyColors(); savePrefs(); });
+  colorDark.addEventListener('input', () => { applyColors(); savePrefs(); });
+
+  exportBtn.addEventListener('click', () => {
+    const doc = preview.contentDocument || preview.contentWindow.document;
+    const rootStyle = doc.documentElement.style;
+    rootStyle.setProperty('--primary', colorPrimary.value);
+    rootStyle.setProperty('--primary-dark', colorDark.value);
+    const html = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index-modificado.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    localStorage.removeItem('porcinoEditor');
+    colorPrimary.value = '#FF0000';
+    colorDark.value = '#CC0000';
+    applyColors();
+  });
+
+  preview.addEventListener('load', () => {
+    loadPrefs();
+    applyColors();
+    setTimeout(enableEdit, 500);
+  });
+</script>
+</body>
+</html>
