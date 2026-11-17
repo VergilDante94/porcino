@@ -54,22 +54,22 @@
       {
         "name": "Ing. Agrónomo",
         "role": "Director de producción",
-        "initial": "A"
+        "initial": "👤"
       },
       {
         "name": "Veterinario",
         "role": "Sanidad animal",
-        "initial": "B"
+        "initial": "👤"
       },
       {
         "name": "Técnico",
         "role": "Manejo de piara",
-        "initial": "C"
+        "initial": "👤"
       },
       {
         "name": "Administración",
         "role": "Gestión y ventas",
-        "initial": "D"
+        "initial": "👤"
       }
     ]
   },
@@ -99,7 +99,7 @@
     "email": "contacto@porcinocubano.cu"
   },
   "colors": {
-    "primary": "#ff0000",
+    "primary": "#ea9d48",
     "primaryDark": "#cc0000",
     "accent": "#ff9800"
   }
