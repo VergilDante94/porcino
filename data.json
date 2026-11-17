@@ -1,6 +1,6 @@
 {
   "hero": {
-    "title": "Bienvenidos a Porcino Cubano",
+    "title": "Bienvenidos a Porcino Pinar del Rio",
     "subtitle": "Producción porcina de calidad, comprometida con el desarrollo agropecuario de Cuba. Carne fresca, genética mejorada y asesoría técnica.",
     "ctaText": "Contáctanos"
   },
@@ -99,8 +99,8 @@
     "email": "contacto@porcinocubano.cu"
   },
   "colors": {
-    "primary": "#c61c17",
-    "primaryDark": "#575757",
-    "accent": "#c61c17"
+    "primary": "#ff0000",
+    "primaryDark": "#cc0000",
+    "accent": "#ff9800"
   }
 }

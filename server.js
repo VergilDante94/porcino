@@ -2,16 +2,42 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+// Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = Date.now() + '-' + Math.round(Math.random() * 1e9) + ext;
+    cb(null, name);
+  }
+});
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Solo imágenes permitidas'));
+  }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'porcino-secret-key',
@@ -93,7 +119,8 @@ function getDefaultData() {
       primary: "#FF0000",
       primaryDark: "#CC0000",
       accent: "#ff9800"
-    }
+    },
+    news: []
   };
 }
 
@@ -108,6 +135,43 @@ app.get('/api/content', (req, res) => {
 
 app.post('/api/content', requireAuth, (req, res) => {
   writeData(req.body);
+  res.json({ success: true });
+});
+
+// News endpoints
+app.get('/api/news', (req, res) => {
+  const data = readData();
+  res.json(data.news || []);
+});
+
+app.post('/api/news', requireAuth, (req, res) => {
+  const data = readData();
+  if (!data.news) data.news = [];
+  const post = {
+    id: Date.now().toString(),
+    title: req.body.title,
+    image: req.body.image,
+    content: req.body.content,
+    date: new Date().toISOString()
+  };
+  data.news.unshift(post);
+  writeData(data);
+  res.json({ success: true, post });
+});
+
+app.put('/api/news/:id', requireAuth, (req, res) => {
+  const data = readData();
+  const idx = data.news.findIndex(p => p.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ success: false, message: 'No encontrado' });
+  data.news[idx] = { ...data.news[idx], ...req.body };
+  writeData(data);
+  res.json({ success: true });
+});
+
+app.delete('/api/news/:id', requireAuth, (req, res) => {
+  const data = readData();
+  data.news = (data.news || []).filter(p => p.id !== req.params.id);
+  writeData(data);
   res.json({ success: true });
 });
 
@@ -128,6 +192,11 @@ app.post('/api/logout', (req, res) => {
 
 app.get('/api/check-auth', (req, res) => {
   res.json({ isAdmin: !!req.session.isAdmin });
+});
+
+app.post('/api/upload', requireAuth, upload.single('photo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, message: 'No se subió archivo' });
+  res.json({ success: true, url: `/uploads/${req.file.filename}` });
 });
 
 app.listen(PORT, () => {

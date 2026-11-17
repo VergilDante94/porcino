@@ -34,6 +34,29 @@
   .color-picker input[type="color"] { width: 40px; height: 32px; border: none; border-radius: 4px; cursor: pointer; }
   .hidden { display: none !important; }
   .login-form { max-width: 400px; margin: 0 auto; }
+  .back-to-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s, visibility .3s, background .2s;
+    z-index: 99;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  }
+  .back-to-top.visible { opacity: 1; visibility: visible; }
+  .back-to-top:hover { background: var(--primary-dark); }
 </style>
 </head>
 <body>
@@ -209,6 +232,27 @@
         </div>
       </div>
 
+      <!-- Noticias -->
+      <div class="section-editor">
+        <h2>Noticias / Blog</h2>
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="newsTitle" placeholder="Título de la noticia" />
+        </div>
+        <div class="form-group">
+          <label>Imagen</label>
+          <input type="file" id="newsImage" accept="image/*" />
+          <img id="newsImagePreview" style="display:none;max-width:200px;margin-top:8px;border-radius:8px;" />
+        </div>
+        <div class="form-group">
+          <label>Contenido</label>
+          <textarea id="newsContent" rows="6" placeholder="Contenido de la noticia..."></textarea>
+        </div>
+        <button id="newsSaveBtn">Publicar noticia</button>
+        <h3 style="margin-top:20px;">Noticias publicadas</h3>
+        <div id="newsList"></div>
+      </div>
+
       <!-- Footer -->
       <div class="section-editor">
         <h2>Footer</h2>
@@ -263,6 +307,7 @@ async function checkAuth() {
     loginView.classList.add('hidden');
     adminView.classList.remove('hidden');
     loadContent();
+    loadNews();
   }
 }
 
@@ -386,21 +431,53 @@ function renderMembers(members) {
       <div class="field-row">
         <div class="form-group"><label>Nombre</label><input type="text" value="${m.name}" data-field="name" data-index="${i}" /></div>
         <div class="form-group"><label>Rol</label><input type="text" value="${m.role}" data-field="role" data-index="${i}" /></div>
-        <div class="form-group"><label>Inicial</label><input type="text" value="${m.initial}" data-field="initial" data-index="${i}" maxlength="1" style="width:60px;" /></div>
+        <div class="form-group"><label>Inicial (fallback)</label><input type="text" value="${m.initial || ''}" data-field="initial" data-index="${i}" maxlength="1" style="width:60px;" /></div>
       </div>
+      <div class="form-group">
+        <label>Foto</label>
+        <input type="file" accept="image/*" data-field="photo" data-index="${i}" />
+        <small style="color:var(--muted);font-size:12px;">Selecciona una imagen desde tu PC (máx 5MB)</small>
+      </div>
+      ${m.photo ? `<div style="margin-top:8px;"><img src="${m.photo}" alt="${m.name}" style="max-width:100px;border-radius:50%;border:2px solid var(--primary);" /></div>` : ''}
     `;
     container.appendChild(div);
   });
   document.querySelectorAll('#equiposMembers [data-field]').forEach(el => {
-    el.addEventListener('input', () => {
-      const i = parseInt(el.dataset.index);
-      currentData.equipos.members[i][el.dataset.field] = el.value;
-    });
+    if (el.type === 'file') {
+      el.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('photo', file);
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+          });
+          const data = await res.json();
+          if (data.success) {
+            const i = parseInt(el.dataset.index);
+            currentData.equipos.members[i].photo = data.url;
+            renderMembers(currentData.equipos.members);
+          } else {
+            alert('Error subiendo imagen: ' + data.message);
+          }
+        } catch (err) {
+          alert('Error subiendo imagen');
+        }
+      });
+    } else {
+      el.addEventListener('input', () => {
+        const i = parseInt(el.dataset.index);
+        currentData.equipos.members[i][el.dataset.field] = el.value;
+      });
+    }
   });
 }
 
 function addMember() {
-  currentData.equipos.members.push({ name: 'Nuevo', role: 'Rol', initial: 'N' });
+  currentData.equipos.members.push({ name: 'Nuevo', role: 'Rol', initial: 'N', photo: '' });
   renderMembers(currentData.equipos.members);
 }
 
@@ -526,7 +603,87 @@ saveBtn.addEventListener('click', async () => {
   }
 });
 
+// News management
+const newsTitle = document.getElementById('newsTitle');
+const newsContent = document.getElementById('newsContent');
+const newsImage = document.getElementById('newsImage');
+const newsImagePreview = document.getElementById('newsImagePreview');
+const newsSaveBtn = document.getElementById('newsSaveBtn');
+const newsList = document.getElementById('newsList');
+let currentNewsImage = '';
+
+newsImage.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('photo', file);
+  const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
+  const data = await res.json();
+  if (data.success) {
+    currentNewsImage = data.url;
+    newsImagePreview.src = data.url;
+    newsImagePreview.style.display = 'block';
+  }
+});
+
+async function loadNews() {
+  const res = await api('/api/news');
+  if (res.length === 0) {
+    newsList.innerHTML = '<p style="color:var(--muted);">No hay noticias publicadas.</p>';
+    return;
+  }
+  newsList.innerHTML = res.map(n => `
+    <div class="card-editor">
+      <h4>${n.title}</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">${new Date(n.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      ${n.image ? `<img src="${n.image}" style="max-width:150px;border-radius:6px;margin-bottom:8px;" />` : ''}
+      <p style="font-size:14px;">${n.content.substring(0, 100)}...</p>
+      <button class="secondary" onclick="deleteNews('${n.id}')" style="margin-top:8px;">Eliminar</button>
+    </div>
+  `).join('');
+}
+
+newsSaveBtn.addEventListener('click', async () => {
+  if (!newsTitle.value || !newsContent.value) {
+    showAlert(saveAlert, 'Título y contenido son obligatorios', true);
+    return;
+  }
+  const res = await api('/api/news', { method: 'POST', body: JSON.stringify({
+    title: newsTitle.value,
+    image: currentNewsImage,
+    content: newsContent.value
+  }) });
+  if (res.success) {
+    showAlert(saveAlert, 'Noticia publicada');
+    newsTitle.value = '';
+    newsContent.value = '';
+    newsImage.value = '';
+    newsImagePreview.style.display = 'none';
+    currentNewsImage = '';
+    loadNews();
+  }
+});
+
+async function deleteNews(id) {
+  if (confirm('Eliminar esta noticia?')) {
+    await api('/api/news/' + id, { method: 'DELETE' });
+    loadNews();
+  }
+}
+
 checkAuth();
+loadNews();
+</script>
+<button class="back-to-top" id="backToTop">↑</button>
+<script>
+  const backToTopBtn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) backToTopBtn.classList.add('visible');
+    else backToTopBtn.classList.remove('visible');
+  });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 </script>
 </body>
 </html>

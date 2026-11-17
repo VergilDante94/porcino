@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Noticias - Porcino Cubano</title>
+<style>
+  :root { --primary: #FF0000; --primary-dark: #CC0000; --accent: #ff9800; --bg: #f5f5f0; --text: #222; --muted: #666; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+  a { color: var(--primary); text-decoration: none; }
+  header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); position: sticky; top: 0; z-index: 10; }
+  .nav { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; gap: 16px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; }
+  .brand h1 { font-size: 20px; color: var(--primary-dark); }
+  .brand small { color: var(--muted); font-size: 12px; }
+  .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav-links a { padding: 8px 14px; border-radius: 6px; color: var(--text); font-weight: 500; transition: background .2s, color .2s; }
+  .nav-links a:hover { background: var(--bg); color: var(--primary); }
+  .nav-links a.active { background: var(--primary); color: #fff; }
+  .nav-links a.admin-btn { background: var(--primary); color: #fff; margin-left: 8px; }
+  .nav-links a.admin-btn:hover { background: var(--primary-dark); color: #fff; }
+  section { max-width: 1100px; margin: 0 auto; padding: 60px 20px; }
+  section h2 { font-size: 32px; color: var(--primary-dark); margin-bottom: 16px; }
+  section .lead { color: var(--muted); margin-bottom: 30px; }
+  .blog-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .blog-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .blog-card img { width: 100%; height: 220px; object-fit: cover; }
+  .blog-card .content { padding: 20px; }
+  .blog-card h3 { color: var(--primary-dark); margin-bottom: 8px; font-size: 20px; }
+  .blog-card .date { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .blog-card p { color: var(--text); font-size: 14px; line-height: 1.6; }
+  .blog-card .read-more { display: inline-block; margin-top: 12px; color: var(--primary); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .blog-detail { display: none; background: #fff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .blog-detail img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
+  .blog-detail h2 { color: var(--primary-dark); margin-bottom: 10px; }
+  .blog-detail .date { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .blog-detail .content { font-size: 16px; line-height: 1.7; white-space: pre-wrap; }
+  .back-btn { display: inline-block; margin-bottom: 20px; color: var(--primary); font-weight: 600; cursor: pointer; }
+  .empty { text-align: center; color: var(--muted); padding: 60px 20px; font-size: 18px; }
+.back-to-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s, visibility .3s, background .2s;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.back-to-top.visible { opacity: 1; visibility: visible; }
+.back-to-top:hover { background: var(--primary-dark); }
+
+  footer { background: var(--primary-dark); color: #fff; padding: 40px 20px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  footer h4 { margin-bottom: 10px; color: var(--accent); }
+  footer p, footer a { color: #e8f5e9; font-size: 14px; }
+  .copy { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.15); font-size: 13px; opacity: .8; }
+  @media (max-width: 600px) { .nav { flex-direction: column; align-items: flex-start; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div><h1>Porcino Cubano</h1><small>Empresa porcina de Cuba</small></div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="index.html#nosotros">Nosotros</a>
+      <a href="index.html#servicios">Servicios</a>
+      <a href="index.html#equipos">Equipos</a>
+      <a href="index.html#galeria">Galería</a>
+      <a href="index.html#contacto">Contacto</a>
+      <a href="noticias.html" class="active">Noticias</a>
+      <a href="/admin.html" class="admin-btn">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<section>
+  <h2>Noticias</h2>
+  <p class="lead">Últimas noticias y actualizaciones de Porcino Cubano.</p>
+
+  <div id="blogList" class="blog-grid"></div>
+
+  <div id="blogDetail" class="blog-detail">
+    <a class="back-btn" onclick="showList()">← Volver a noticias</a>
+    <h2 id="detailTitle"></h2>
+    <div class="date" id="detailDate"></div>
+    <img id="detailImage" style="display:none;" />
+    <div class="content" id="detailContent"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div><h4>Porcino Cubano</h4><p>Empresa porcina de Cuba. Calidad y compromiso con el campo.</p></div>
+    <div><h4>Contacto</h4><p>Tel: +53 5 XXX XXXX</p><p>Email: contacto@porcinocubano.cu</p></div>
+    <div><h4>Enlaces</h4><p><a href="index.html">Inicio</a></p><p><a href="index.html#nosotros">Nosotros</a></p><p><a href="index.html#contacto">Contacto</a></p></div>
+  </div>
+  <div class="copy">© 2026 Porcino Cubano. Todos los derechos reservados.</div>
+</footer>
+
+<script>
+let allPosts = [];
+
+async function loadNews() {
+  try {
+    const res = await fetch('/api/news');
+    allPosts = await res.json();
+    const container = document.getElementById('blogList');
+    if (allPosts.length === 0) {
+      container.innerHTML = '<div class="empty">No hay noticias publicadas aún.</div>';
+      return;
+    }
+    container.innerHTML = allPosts.map(p => `
+      <div class="blog-card">
+        ${p.image ? `<img src="${p.image}" alt="${p.title}" />` : ''}
+        <div class="content">
+          <h3>${p.title}</h3>
+          <div class="date">${new Date(p.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <p>${p.content.substring(0, 200)}${p.content.length > 200 ? '...' : ''}</p>
+          <span class="read-more" onclick="showDetail('${p.id}')">Leer más →</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('blogList').innerHTML = '<div class="empty">Error cargando noticias.</div>';
+  }
+}
+
+function showDetail(id) {
+  const post = allPosts.find(p => p.id === id);
+  if (!post) return;
+  document.getElementById('blogList').style.display = 'none';
+  document.getElementById('blogDetail').style.display = 'block';
+  document.getElementById('detailTitle').textContent = post.title;
+  document.getElementById('detailDate').textContent = new Date(post.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+  const img = document.getElementById('detailImage');
+  if (post.image) { img.src = post.image; img.style.display = 'block'; }
+  else img.style.display = 'none';
+  document.getElementById('detailContent').textContent = post.content;
+  window.scrollTo(0, 0);
+}
+
+function showList() {
+  document.getElementById('blogList').style.display = 'grid';
+  document.getElementById('blogDetail').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+loadNews();
+</script>
+<button class="back-to-top" id="backToTop">↑</button>
+<script>
+  const backToTopBtn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) backToTopBtn.classList.add('visible');
+    else backToTopBtn.classList.remove('visible');
+  });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
